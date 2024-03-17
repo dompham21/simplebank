@@ -2,15 +2,15 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
-	"github.com/dompham21/simplebank/util"
 	"github.com/stretchr/testify/require"
+	"github.com/dompham21/simplebank/util"
 )
 
 func createRandomAccount(t *testing.T) Account {
-
 	arg := CreateAccountParams{
 		Owner:    util.RandomOwner(),
 		Balance:  util.RandomMoney(),
@@ -74,27 +74,25 @@ func TestDeleteAccount(t *testing.T) {
 
 	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
 	require.Error(t, err)
+	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, account2)
 }
 
 func TestListAccounts(t *testing.T) {
-	var lastAccount Account
 	for i := 0; i < 10; i++ {
-		lastAccount = createRandomAccount(t)
+		createRandomAccount(t)
 	}
 
 	arg := ListAccountsParams{
-		Owner:  lastAccount.Owner,
 		Limit:  5,
-		Offset: 0,
+		Offset: 5,
 	}
 
 	accounts, err := testQueries.ListAccounts(context.Background(), arg)
 	require.NoError(t, err)
-	require.NotEmpty(t, accounts)
+	require.Len(t, accounts, 5)
 
 	for _, account := range accounts {
 		require.NotEmpty(t, account)
-		require.Equal(t, lastAccount.Owner, account.Owner)
 	}
 }
