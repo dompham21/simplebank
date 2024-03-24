@@ -1,6 +1,6 @@
 module github.com/dompham21/simplebank
 
-go 1.22.1
+go 1.16
 
 require (
 	github.com/gin-gonic/gin v1.9.1
